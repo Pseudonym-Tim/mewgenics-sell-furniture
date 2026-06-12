@@ -1767,7 +1767,7 @@ static int SellTrackedFurniture(FurnitureButtonRecord* record)
     return 1;
 }
 
-static int IsButtonHoverOrSelected(void* button)
+static int IsButtonHoveredOrPressed(void* button)
 {
     int32_t state;
 
@@ -1785,7 +1785,7 @@ static int IsButtonHoverOrSelected(void* button)
         return 0;
     }
 
-    return (state == 1 || state == 2 || state == 3);
+    return (state == 1 || state == 2);
 }
 
 static void __fastcall HookButtonUpdate(void* button)
@@ -1824,8 +1824,9 @@ static void __fastcall HookButtonUpdate(void* button)
 
     record->right_mouse_was_down = 1U;
 
-    if (IsButtonHoverOrSelected(button))
+    if (IsButtonHoveredOrPressed(button))
     {
+        record->last_mouse_button_index = RIGHT_MOUSE_BUTTON_INDEX;
         (void)SellTrackedFurniture(record);
     }
 }
@@ -1863,6 +1864,12 @@ static void __fastcall HookButtonActivate(void* button, uint8_t from_mouse)
         record->last_mouse_button_index = -1;
         (void)SellTrackedFurniture(record);
         return;
+    }
+
+    if (record)
+    {
+        record->last_mouse_button_index = -1;
+        record->right_mouse_was_down = 0U;
     }
 
     if (g_nextButtonActivate)
